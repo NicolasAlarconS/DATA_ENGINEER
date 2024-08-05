@@ -30,7 +30,7 @@ def connect_redshift():
         print("Conexión a Redshift exitosa!")
         return conn
     except psycopg2.OperationalError as e:
-        print(f"Error connecting to Redshift: {e}")
+        print(f"Error en la conexion a Redshift: {e}")
         raise
 
 # Extracción de datos de Twelve Data
@@ -53,7 +53,7 @@ def extract_data(symbol):
         values = data['values'][:10]  # Obtener los últimos 10 registros
         return values
     except Exception as e:
-        print(f"Error fetching data for {symbol}: {e}")
+        print(f"Error de extraccion de datos de {symbol}: {e}")
         return None
 
 # Manejo de los datos
@@ -80,7 +80,7 @@ def transform_data(symbol, description, category, data):
         
         return df
     except Exception as e:
-        print(f"Error transforming data for symbol: {symbol}: {e}")
+        print(f"Eerror en la transformacion de datos de: {symbol}: {e}")
         return None
 
 # Carga de datos a Redshift
@@ -124,10 +124,10 @@ def load_data(df):
                 execute_values(cursor, insert_query, rows_to_insert)
                 
                 conn.commit()
-                print(f"Se han agregado un bloque de {len(rows_to_insert)} registros a Redshift.")
+                print(f"Se ha agregado un bloque de {len(rows_to_insert)} registros a Redshift.")
 
     except psycopg2.Error as e:
-        print(f"Error loading data into Redshift: {e}")
+        print(f"Error cargando datos a Redshift: {e}")
     finally:
         conn.close()
 
