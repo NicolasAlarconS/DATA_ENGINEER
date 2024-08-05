@@ -27,7 +27,7 @@ def connect_redshift():
             host=REDSHIFT_HOST,
             port=REDSHIFT_PORT
         )
-        print("Conexión a Redshift exitosa!")
+        print("Conexion a Redshift exitosa!")
         return conn
     except psycopg2.OperationalError as e:
         print(f"Error en la conexion a Redshift: {e}")
@@ -47,7 +47,7 @@ def extract_data(symbol):
         data = response.json()
 
         if 'values' not in data or not data['values']:
-            print(f"No data found for symbol: {symbol}")
+            print(f"No se encontraron datos de: {symbol}")
             return None
 
         values = data['values'][:10]  # Obtener los últimos 10 registros
@@ -86,7 +86,7 @@ def transform_data(symbol, description, category, data):
 # Carga de datos a Redshift
 def load_data(df):
     if df is None or df.empty:
-        print("No data to load.")
+        print("No hay datos que cargar, df vacio.")
         return
 
     conn = connect_redshift()
@@ -147,7 +147,7 @@ stocks = {
 def etl():
     all_data = pd.DataFrame()
     for symbol, (description, category) in stocks.items():
-        print(f"Processing {symbol}...")
+        print(f"Extrallendo.... {symbol}...")
         data = extract_data(symbol)
         if data is not None:
             transformed_data = transform_data(symbol, description, category, data)
