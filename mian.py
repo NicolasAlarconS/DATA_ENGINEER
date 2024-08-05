@@ -107,7 +107,7 @@ def load_data(df):
             print("Tabla en Redshift lista!")
 
             # Preparar datos para inserción en bloque
-            block_size = 100  # Puedes ajustar el tamaño del bloque aquí
+            block_size = 100  # Tamaño del bloque
             for start in range(0, len(df), block_size):
                 end = start + block_size
                 block_df = df.iloc[start:end]
