@@ -11,7 +11,45 @@ Este proyecto de ingeniería de datos se encarga de extraer, transformar, filtra
 - **.gitignore**: Archivo para excluir archivos y directorios del control de versiones.
 - **README.md**: Este archivo de documentación.
 
-## Proceso de Control de Duplicados
+### CreCreación de un ID unico para el control de datos duplicados
+
+  ```python
+  import hashlib
+
+  def generate_id(row):
+      # Crear una cadena que represente los datos de la fila
+      data_string = f"{row['symbol']}-{row['date']}-{row['opening_price']}-{row['closing_price']}-{row['category']}-{row['description']}"
+      
+      # Generar un hash MD5 de la cadena
+      return hashlib.md5(data_string.encode()).hexdigest()
+  ```
+
+#### Creación de una Cadena Representativa de los Datos
+
+- La función toma un registro (`row`) del DataFrame como entrada.
+- Se crea una cadena (`data_string`) que concatena los valores de varias columnas del registro, separadas por guiones (`-`). Estas columnas incluyen:
+  - `'symbol'`: El símbolo de la acción.
+  - `'date'`: La fecha del registro.
+  - `'opening_price'`: El precio de apertura.
+  - `'closing_price'`: El precio de cierre.
+  - `'category'`: La categoría del registro.
+  - `'description'`: Una descripción del registro.
+
+#### Generación del Hash MD5
+
+- La cadena `data_string` se codifica a bytes utilizando `data_string.encode()`.
+- Se utiliza `hashlib.md5()` para generar el hash MD5 de la cadena codificada.
+- La función `hexdigest()` convierte el hash en una cadena hexadecimal.
+
+#### Retorno del Hash MD5
+
+- La función devuelve el hash MD5 generado como una cadena hexadecimal, que sirve como un identificador único para el registro basado en los datos proporcionados.
+
+#### Propósito
+
+La generación de un hash MD5 asegura que cada registro tenga un identificador único derivado de su contenido. Este identificador es útil para evitar duplicados y mantener la integridad de los datos durante procesos como la carga en una base de datos.
+
+### Proceso de Control de Duplicados
 
 1. **Conexión a Redshift**
    - El script establece una conexión a la base de datos Redshift utilizando las credenciales proporcionadas en el archivo de configuración.
@@ -48,8 +86,7 @@ new_rows = block_df[~block_df['id'].isin(existing_ids)]
 ## Instalación y Configuración
 ```
 
-
-### Configuración Local del proyecto
+## Configuración Local del proyecto
 
 1. **Clona el repositorio**
 
@@ -96,7 +133,7 @@ new_rows = block_df[~block_df['id'].isin(existing_ids)]
     python main.py
     ```
 
-### Configuración en GitHub Codespaces del proyecto
+## Configuración en GitHub Codespaces del proyecto
 
 1. **Abre el repositorio en GitHub Codespaces
 
