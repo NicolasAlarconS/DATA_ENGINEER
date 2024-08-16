@@ -11,7 +11,7 @@ Este proyecto de ingeniería de datos se encarga de extraer, transformar, filtra
 - **.gitignore**: Archivo para excluir archivos y directorios del control de versiones.
 - **README.md**: Este archivo de documentación.
 
-### CreCreación de un ID unico para el control de datos duplicados
+### Creación de un ID unico para el control de datos duplicados
 
   ```python
   import hashlib
@@ -24,7 +24,7 @@ Este proyecto de ingeniería de datos se encarga de extraer, transformar, filtra
       return hashlib.md5(data_string.encode()).hexdigest()
   ```
 
-#### Creación de una Cadena Representativa de los Datos
+#### Creación de una cadena representativa de los datos
 
 - La función toma un registro (`row`) del DataFrame como entrada.
 - Se crea una cadena (`data_string`) que concatena los valores de varias columnas del registro, separadas por guiones (`-`). Estas columnas incluyen:
@@ -35,13 +35,13 @@ Este proyecto de ingeniería de datos se encarga de extraer, transformar, filtra
   - `'category'`: La categoría del registro.
   - `'description'`: Una descripción del registro.
 
-#### Generación del Hash MD5
+#### Generación del hash MD5
 
 - La cadena `data_string` se codifica a bytes utilizando `data_string.encode()`.
 - Se utiliza `hashlib.md5()` para generar el hash MD5 de la cadena codificada.
 - La función `hexdigest()` convierte el hash en una cadena hexadecimal.
 
-#### Retorno del Hash MD5
+#### Retorno del hash MD5
 
 - La función devuelve el hash MD5 generado como una cadena hexadecimal, que sirve como un identificador único para el registro basado en los datos proporcionados.
 
@@ -49,28 +49,28 @@ Este proyecto de ingeniería de datos se encarga de extraer, transformar, filtra
 
 La generación de un hash MD5 asegura que cada registro tenga un identificador único derivado de su contenido. Este identificador es útil para evitar duplicados y mantener la integridad de los datos durante procesos como la carga en una base de datos.
 
-### Proceso de Control de Duplicados
+### Proceso de control de duplicados
 
 1. **Conexión a Redshift**
    - El script establece una conexión a la base de datos Redshift utilizando las credenciales proporcionadas en el archivo de configuración.
 
-2. **Creación de la Tabla**
+2. **Creación de la tabla**
    - Antes de insertar datos, el script verifica si la tabla `stock_data` existe en el esquema especificado. Si no existe, se crea con una definición que incluye una columna `id` como clave primaria. La clave primaria no asegura que los identificadores en esta columna sean únicos en la tabla ya que Redshift permite claves primarias repetidas, por lo que el control de suplicados se hace antes del ingreso de los datos.
 
-3. **División de Datos en Bloques**
+3. **División de datos en bloques**
    - Los datos del DataFrame (`df`) se dividen en bloques de tamaño especificado (`block_size`). Esto se hace para manejar grandes volúmenes de datos de manera más eficiente y para realizar la inserción en lotes.
 
-4. **Obtención de IDs Existentes**
+4. **Obtención de IDs existentes**
    - Para cada bloque de datos, se ejecuta una consulta SQL para obtener todos los `id` existentes en la tabla `stock_data`. Estos IDs se almacenan en un conjunto (`existing_ids`), que facilita la búsqueda rápida.
 
-5. **Filtrado de Datos No Duplicados**
+5. **Filtrado de datos no duplicados**
    - Con el conjunto de IDs existentes, el script filtra el bloque de datos actual para excluir aquellas filas cuyos IDs ya están en la tabla. Esto se hace utilizando la función `isin` de pandas combinada con una negación (`~`) para seleccionar solo las filas con IDs que no están en `existing_ids`.
 
-6. **Inserción de Nuevos Registros**
+6. **Inserción de nuevos registros**
    - Después de filtrar los datos, se preparan las filas que deben ser insertadas en la base de datos. Si no hay registros nuevos para insertar, se omite la inserción para ese bloque de datos.
    - Si hay registros nuevos, se realiza la inserción en bloque utilizando la función `execute_values` de `psycopg2`, que permite insertar múltiples filas de manera eficiente.
 
-7. **Confirmación y Cierre de Conexión**
+7. **Confirmación y cierre de conexión**
    - Después de cada inserción en bloque, se confirma la transacción con `conn.commit()`.
    - Finalmente, se cierra la conexión a la base de datos.
 
@@ -86,7 +86,7 @@ new_rows = block_df[~block_df['id'].isin(existing_ids)]
 ## Instalación y Configuración
 ```
 
-## Configuración Local del proyecto
+## Configuración local del proyecto
 
 1. **Clona el repositorio**
 
