@@ -13,10 +13,12 @@ RUN apt-get update && apt-get install -y \
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Configura la variable PYTHONPATH
+ENV PYTHONPATH="${PYTHONPATH}:/usr/src/app/modules"
+
 USER airflow
 
 ENTRYPOINT ["/bin/bash","/start.sh"]
 
 # Exponemos el puerto 8080 para acceder al servidor web de Airflow
 EXPOSE 8080
-

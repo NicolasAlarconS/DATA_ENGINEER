@@ -2,13 +2,15 @@ import requests
 import pandas as pd
 from config import stocks, TWELVE_DATA_API_KEY, URL
 
-print(TWELVE_DATA_API_KEY)
+
 # Extracción de datos de Twelve Data
-def extract_data(**kwargs):
+def extract_data():
     df = pd.DataFrame()
     for symbol, (description, category) in stocks.items():
         try:
+
             url = URL
+            
             params = {
                 'symbol': symbol,
                 'interval': '1day',
@@ -40,10 +42,10 @@ def extract_data(**kwargs):
             print(f"Error de extraccion de datos de {symbol}: {e}")
 
     # Convertir el DataFrame a JSON para pasar por XCom
-    df_json = df.to_json()
+    #df_json = df.to_json()
 
     # Guardar el DataFrame JSON en XCom
-    kwargs['ti'].xcom_push(key='extracted_data', value=df_json)
+    #kwargs['ti'].xcom_push(key='extracted_data', value=df_json)
 
-    return df_json
+    return df
 

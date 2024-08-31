@@ -4,17 +4,18 @@ from psycopg2.extras import execute_values
 from redshift_conn import connect_redshift
 from config import REDSHIFT_SCHEMA
 
-print("HOLA")
 
 # Carga de datos a Redshift
-def load_data(**kwargs):
+def load_data(df):
 
-    ti = kwargs['ti']
+    #ti = kwargs['ti']
 
     # Obtener el DataFrame JSON de la tarea anterior
-    transformed_data_json = ti.xcom_pull(task_ids='transform_data', key='transformed_data')
-    if transformed_data_json:
-        df = pd.read_json(transformed_data_json)
+    #transformed_data_json = ti.xcom_pull(task_ids='transform_data', key='transformed_data')
+    
+    #if true solo por futura mudificacion
+    if True:
+        #df = pd.read_json(transformed_data_json)
     
         # Conexion a Redshift
         conn = connect_redshift()
