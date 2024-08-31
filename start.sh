@@ -7,11 +7,12 @@ airflow db migrate
 airflow users create \
     --username admin \
     --password admin \
-    --firstname Admin \
-    --lastname User \
-    --role Admin \
+    --firstname admin \
+    --lastname admin \
+    --role admin \
     --email admin@example.com
 
 # Arranca el scheduler y el webserver de Airflow
-airflow scheduler &
 airflow webserver
+airflow scheduler 
+

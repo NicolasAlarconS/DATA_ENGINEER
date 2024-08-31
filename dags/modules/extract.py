@@ -1,8 +1,8 @@
 import requests
 import pandas as pd
-from .config import stocks, TWELVE_DATA_API_KEY, URL
+from config import stocks, TWELVE_DATA_API_KEY, URL
 
-
+print(TWELVE_DATA_API_KEY)
 # Extracción de datos de Twelve Data
 def extract_data(**kwargs):
     df = pd.DataFrame()

@@ -1,26 +1,22 @@
-
-FROM apache/airflow:2.9.2
-
-USER root
-
-# Crear directorios necesarios
-RUN mkdir -p /opt/airflow/dags /opt/airflow/modules
+FROM apache/airflow:slim-latest-python3.11
 
 # Copiar los archivos necesarios
 COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
 
-# Copiar los DAGs y módulos
-COPY dags /opt/airflow/dags
-COPY modules /opt/airflow/modules
+USER root
+
+RUN apt-get update && apt-get install -y \
+    wget
+
+# Da permisos de ejecución al script de inicialización
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 USER airflow
 
-# Da permisos de ejecución al script de inicialización
-RUN chmod +x init_airflow.sh
+ENTRYPOINT ["/bin/bash","/start.sh"]
 
 # Exponemos el puerto 8080 para acceder al servidor web de Airflow
 EXPOSE 8080
 
-# Comando por defecto
-CMD ["webserver"]
