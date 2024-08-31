@@ -6,7 +6,7 @@ from .config import REDSHIFT_SCHEMA
 
 
 # Carga de datos a Redshift
-def load_data(**kwargs)):
+def load_data(**kwargs):
 
     ti = kwargs['ti']
 
