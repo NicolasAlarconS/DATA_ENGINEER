@@ -1,7 +1,7 @@
 FROM apache/airflow:slim-latest-python3.11
 
 # Copiar los archivos necesarios
-COPY requirements.txt /requirements.txt
+COPY dependencies/requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
 
 USER root
