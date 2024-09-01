@@ -1,3 +1,4 @@
+# Variables de entorno:
 REDSHIFT_USER = 'nicolas_alarcon_k_coderhouse'
 REDSHIFT_PASSWORD = 'nf32F7968i'
 REDSHIFT_HOST = 'data-engineer-cluster.cyhh5bfevlmn.us-east-1.redshift.amazonaws.com'
