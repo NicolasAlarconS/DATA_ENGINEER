@@ -4,11 +4,11 @@ import os
 # Añade el directorio 'dags/modules' al PYTHONPATH
 sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
-from modules.main import etl
+import pandas as pd
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-
+from modules import extract, transform, load 
 
 # Argumentos por defecto para el DAG
 default_args = {
@@ -28,10 +28,27 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    # Definir las tareas
-    task_extract = PythonOperator(
-        task_id='ETL',
-        python_callable=etl,
+    # Tarea de extracción
+    extract_task = PythonOperator(
+        task_id='extract_data',
+        python_callable=extract.extract_data,
+        dag=dag
     )
 
-    task_extract 
+    # Tarea de transformación
+    transform_task = PythonOperator(
+        task_id='transform_data',
+        python_callable=lambda: transform.transform_data(pd.read_csv('/tmp/extracted_data.csv')),
+        dag=dag
+    )
+
+    # Tarea de carga
+    load_task = PythonOperator(
+        task_id='load_data',
+        python_callable=lambda: load.load_data(pd.read_csv('/tmp/transformed_data.csv')),
+        dag=dag
+    )
+
+    # Definir dependencias
+    extract_task >> transform_task >> load_task
+
