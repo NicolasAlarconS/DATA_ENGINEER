@@ -137,13 +137,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      WEB_SERVER_HOST: "curly-palm-tree-rr9gjrvwwg6cpr95-8080.app.github.dev"  
+      WEB_SERVER_HOST: ${WEB_SERVER_HOST}  
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 30s
+    entrypoint: ["/opt/airflow/init_env.sh"]  
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
