@@ -7,8 +7,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 import pandas as pd
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.sensors.filesystem import FileSensor
+from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
-from modules import extract, transform, load 
+from modules import extract, transform, load, email_notification
+
 
 # Argumentos por defecto para el DAG
 default_args = {
@@ -17,11 +20,13 @@ default_args = {
     'start_date': datetime(2024, 8, 30),
     'retries': 1,
     'retry_delay': timedelta(minutes=1),
+    'on_failure_callback': email_notification.handle_dag_status,
+    'on_success_callback': email_notification.handle_dag_status,
 }
 
-# Definición del DAG usando `with DAG as`
+# Definición del DAG
 with DAG(
-    '0_ETL_DAG_NICOLAS_ALARCON',
+    'ETL_NICOLAS_ALARCON',
     default_args=default_args,
     description='ETL para datos financieros',
     schedule_interval='@daily',
@@ -49,6 +54,35 @@ with DAG(
         dag=dag
     )
 
+    # Sensor para verificar la existencia del archivo csv extraido
+    extract_file_sensor = FileSensor(
+        task_id='extract_file_sensor',
+        fs_conn_id='fs_default',
+        filepath='/tmp/extracted_data.csv',
+        poke_interval=30,  # Tiempo en segundos entre comprobaciones
+        timeout=600,  # Tiempo máximo en segundos para esperar el archivo
+        mode='poke',  # Puedes usar 'reschedule' en lugar de 'poke' si prefieres ese modo
+        dag=dag
+    )
+
+    # Sensor para verificar la existencia del archivo csv transformado
+    transform_file_sensor = FileSensor(
+        task_id='transform_file_sensor',
+        fs_conn_id='fs_default',
+        filepath='/tmp/transformed_data.csv',
+        poke_interval=30,  # Tiempo en segundos entre comprobaciones
+        timeout=600,  # Tiempo máximo en segundos para esperar el archivo
+        mode='poke',  # Puedes usar 'reschedule' en lugar de 'poke' si prefieres ese modo
+        dag=dag
+    )
+
+    # Eliminar archivos temporales del directorio /tmp
+    cleanup_tmp_files = BashOperator(
+    task_id='cleanup_tmp_files',
+    bash_command='rm -rf /tmp/*',  # Elimina todos los archivos y carpetas en /tmp
+    dag=dag,
+    )
+
     # Definir dependencias
-    extract_task >> transform_task >> load_task
+    extract_task >> extract_file_sensor >> transform_task >> transform_file_sensor >> load_task >> cleanup_tmp_files
 

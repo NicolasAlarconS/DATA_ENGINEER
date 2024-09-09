@@ -6,13 +6,6 @@ from config import REDSHIFT_SCHEMA
 
 # Carga de datos a Redshift
 def load_data(df):
-
-    #ti = kwargs['ti']
-
-    # Obtener el DataFrame JSON de la tarea anterior
-    #transformed_data_json = ti.xcom_pull(task_ids='transform_data', key='transformed_data')
-    
-
     
     # Conexion a Redshift
     conn = connect_redshift()

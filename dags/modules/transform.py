@@ -10,15 +10,7 @@ def generate_id(row):
     return hashlib.md5(data_string.encode()).hexdigest()
 
 def transform_data(df):
-    
-    #ti = kwargs['ti']
 
-    # Obtener el DataFrame JSON de la tarea anterior
-    #extracted_data_json = ti.xcom_pull(task_ids='extract_data', key='extracted_data')
-
-   
-   
-    #df = pd.read_json(extracted_data_json)
     try:
         # Renombrar columnas para que coincidan con los nombres esperados
         df.columns = ['datetime', 'open', 'high', 'low', 'close', 'volume', 'symbol', 'category', 'description']
@@ -42,10 +34,16 @@ def transform_data(df):
         # Selección y reordenamiento de columnas
         df = df[['id', 'symbol', 'date', 'opening_price', 'closing_price', 'category', 'description', 'ingest_date']]
 
+        # Imprime los primeros registros del DataFrame resultante, solo para visualizar
+        print("Datos transformados:\n")
+        print(df.head())
+
+        # Guarda los datos transformados en un archivo CSV en la carpeta temporal
         df.to_csv('/tmp/transformed_data.csv', index=False)
     
         print("Datos correctamente transformados!")
-        
+
+    # Maneja cualquier excepción que pueda ocurrir durante la transformacion de datos y muestra un mensaje de error    
     except Exception as e:
         print(f"Error en la transformación de datos: {e}")
         return None
