@@ -136,6 +136,8 @@ services:
     command: webserver
     ports:
       - "127.0.0.1:8080:8080"
+    environment:
+      - WEB_SERVER_HOST=http://localhost
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
