@@ -75,6 +75,7 @@ x-airflow-common:
 
     # Configuración de conexiones:
     AIRFLOW_CONN_FS_DEFAULT: fs://root@localhost/tmp
+    WEB_SERVER_HOST: http://localhost
 
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
@@ -136,8 +137,6 @@ services:
     command: webserver
     ports:
       - "127.0.0.1:8080:8080"
-    environment:
-      - WEB_SERVER_HOST=http://localhost
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
