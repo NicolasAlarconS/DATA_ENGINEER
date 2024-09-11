@@ -1,6 +1,12 @@
-# Data_Engineer 3ra entrega
+# Data_Engineer entrega final
 
-**NOTA:** He utilizado para esta tercera entrega momentáneamente un archivo `.py` llamado `config.py` dentro de la carpeta `dags/modules/` en reemplazo del archivo `.env` por ciertos problemas.
+**NOTA:**  Renombrar el archivo `.env` (elimina el guion bajo `_` del nombre del archivo), y llenar las variables correspondientes
+
+Para arrancar el proyecto escribir en la terminal
+
+  ```bash
+    docker-comnpose up
+  ```
 
 ## Descripción del Proyecto
 
@@ -15,7 +21,7 @@ Este proyecto de ingeniería de datos está diseñado para extraer, transformar 
 3. **Carga de Datos**: Los datos transformados se cargan en una base de datos Redshift. Se maneja la creación de la tabla necesaria, la inserción en bloques y la eliminación de registros duplicados.
 
 4. **Orquestación con Apache Airflow**:
-   - **Configuración**: El proyecto utiliza Apache Airflow para gestionar el flujo de trabajo ETL. El DAG (Directed Acyclic Graph) está configurado para ejecutar el proceso ETL diariamente.
+   - **Configuración**: El proyecto utiliza Apache Airflow para gestionar el flujo de trabajo ETL. Este está configurado para ejecutar el proceso diariamente.
    - **Ejecución**: Para probar el funcionamiento del DAG, debes acceder a la interfaz de usuario de Apache Airflow con las credenciales predeterminadas (usuario: `airflow`, contraseña: `airflow`). Desde allí, puedes activar manualmente el DAG para verificar su funcionamiento.
 
 ## Estructura del Proyecto
@@ -36,31 +42,52 @@ Este proyecto de ingeniería de datos está diseñado para extraer, transformar 
 
 4. **`docker-compose.yml`**: Configura los servicios necesarios para el proyecto, incluyendo la base de datos y el entorno de Airflow, utilizando Docker Compose.
 
-5. **`Dockerfile`**: Define cómo construir la imagen de Docker para el proyecto, asegurando que todas las dependencias y el código necesario estén incluidos en la imagen.
+5. **`.gitignore`**: Especifica los archivos y directorios que deben ser ignorados por Git, como el entorno virtual y archivos temporales.
 
-6. **`.gitignore`**: Especifica los archivos y directorios que deben ser ignorados por Git, como el entorno virtual y archivos temporales.
+6. **`README.md`**: Documento que proporciona una visión general del proyecto, incluyendo instrucciones de uso y detalles de configuración.
 
-7. **`README.md`**: Documento que proporciona una visión general del proyecto, incluyendo instrucciones de uso y detalles de configuración.
+## Funciones y tareas del DAG 
 
-## Descripción de Funcionalidad
+El DAG `ETL_NICOLAS_ALARCON` automatiza un proceso ETL (Extracción, Transformación y Carga) de datos financieros. Su propósito es gestionar la extracción de datos, su transformación y carga en el destino final, así como la gestión de archivos temporales.
 
-- **`config.py`**: Configura las credenciales y parámetros necesarios para la conexión a Redshift y la API de Twelve Data. Incluye la definición de símbolos de acciones y ETFs a ser procesados.
+## Tareas del DAG
 
-- **`extract.py`**: Extrae datos financieros para cada símbolo definido en `config.py`, obteniendo los últimos 10 registros de la API y almacenándolos en un DataFrame.
+1. **Extracción de Datos**
+   - **Descripción**: Extrae datos desde la fuente especificada.
+   - **Tarea**: `extract_data`
 
-- **`transform.py`**: Transforma el DataFrame extraído, renombrando columnas, generando IDs únicos y añadiendo información adicional como la fecha de ingestión.
+2. **Transformación de Datos**
+   - **Descripción**: Lee los datos extraídos y los transforma en el formato adecuado.
+   - **Tarea**: `transform_data`
 
-- **`load.py`**: Carga el DataFrame transformado en una tabla de Redshift, manejando la creación de la tabla, la inserción en bloques y la eliminación de duplicados.
+3. **Carga de Datos**
+   - **Descripción**: Carga los datos transformados en el destino final.
+   - **Tarea**: `load_data`
 
-- **`main.py`**: Ejecuta el proceso ETL completo: extracción, transformación y carga de datos. Incluye una línea comentada para prueba manual.
+4. **Verificación de Archivos de Extracción**
+   - **Descripción**: Verifica la existencia del archivo de datos extraídos antes de proceder con la transformación.
+   - **Tarea**: `extract_file_sensor`
 
-- **`etl_dag.py`**: Define el DAG en Airflow para ejecutar el proceso ETL a diario, utilizando el operador `PythonOperator` para llamar a la función `etl()` desde `main.py`.
+5. **Verificación de Archivos Transformados**
+   - **Descripción**: Verifica la existencia del archivo de datos transformados antes de proceder con la carga.
+   - **Tarea**: `transform_file_sensor`
 
-- **`redshift_conn.py`**: Maneja la conexión a la base de datos Redshift.
+6. **Limpieza de Archivos Temporales**
+   - **Descripción**: Elimina todos los archivos temporales en el directorio `/tmp` después de la carga de datos.
+   - **Tarea**: `cleanup_tmp_files`
 
-- **`requirements.txt`**: Especifica las bibliotecas y dependencias requeridas para el proyecto.
+## Dependencias
 
-- **`docker-compose.yml`** y **`Dockerfile`**: Configuran el entorno de Docker para el proyecto, permitiendo una configuración y despliegue consistentes en diferentes entornos.
+Las tareas están organizadas de manera que:
+- La extracción de datos ocurre primero.
+- La verificación del archivo de extracción sigue a la extracción de datos.
+- La transformación de datos ocurre después de la verificación del archivo de extracción.
+- La verificación del archivo transformado sigue a la transformación de datos.
+- La carga de datos ocurre después de la verificación del archivo transformado.
+- Finalmente, se realiza la limpieza de archivos temporales después de la carga de datos.
+
+
+## Control de duplicados
 
 ### Creación de un ID unico para el control de datos duplicados
 
@@ -149,9 +176,9 @@ new_rows = block_df[~block_df['id'].isin(existing_ids)]
     pip install -r dependencies/requirements.txt
     ```
 
-4. **Configura el archivo config.py dentro de modules**
+4. **Configura el archivo `.env`**
 
-    Asegúrate de que el archivo config.py en la carpeta config contiene las variables de entorno necesarias, como las credenciales de conexión a Redshift y otras configuraciones.
+    Asegúrate de que el archivo `.env` esté correctamente renombrado (elimina el guion bajo `_` del nombre del archivo), llena estas variables con la información requerida, como las credenciales de conexión a Redshift y otras configuraciones pertinentes, dentro del archivo `.env`.
 
 5. **Ejecuta el proyectos**
 
@@ -166,9 +193,9 @@ new_rows = block_df[~block_df['id'].isin(existing_ids)]
     Haz clic en el botón Code y selecciona Open with Codespaces.
     Crea un nuevo Codespace.
    
-2. **Configura el archivo config.py dentro de modules**
+2. **Configura el archivo `.env`**
 
-    Asegúrate de que el archivo config.py en la carpeta config contiene las variables de entorno necesarias, como las credenciales de conexión a Redshift y otras configuraciones.
+    Asegúrate de que el archivo `.env` esté correctamente renombrado (elimina el guion bajo `_` del nombre del archivo), llena estas variables con la información requerida, como las credenciales de conexión a Redshift y otras configuraciones pertinentes, dentro del archivo `.env`.
 
 3. **Ejecuta el proyecto**
 
