@@ -36,6 +36,7 @@ Este proyecto de ingeniería de datos está diseñado para extraer, transformar 
    - **`load.py`**: Contiene la función `load_data()`, que carga el DataFrame transformado en una tabla en Redshift. Maneja la creación de la tabla, inserción de datos en bloques y evita la inserción de duplicados.
    - **`main.py`**: Define la función `etl()`, que ejecuta el proceso ETL completo: extracción de datos, transformación y carga. También incluye una línea comentada para probar el proceso ETL manualmente.
    - **`redshift_conn.py`**: Contiene la función `connect_redshift()` para manejar la conexión a la base de datos Redshift utilizando `psycopg2`.
+   - **`email_notification.py`**: Este archivo gestiona el envío de correos electrónicos para notificar el estado del DAG en Airflow. Aquí se detallan sus componentes:
 
 3. **`dependencies/`**
    - **`requirements.txt`**: Lista las dependencias necesarias para el proyecto, como `pandas`, `requests`, `psycopg2`, y `apache-airflow`.
@@ -48,33 +49,32 @@ Este proyecto de ingeniería de datos está diseñado para extraer, transformar 
 
 ## Funciones y tareas del DAG 
 
-El DAG `ETL_NICOLAS_ALARCON` automatiza un proceso ETL (Extracción, Transformación y Carga) de datos financieros. Su propósito es gestionar la extracción de datos, su transformación y carga en el destino final, así como la gestión de archivos temporales.
+El DAG `ETL_NICOLAS_ALARCON` automatiza un proceso ETL (Extracción, Transformación y Carga) de datos financieros ejecutandolo diariamente.
 
-## Tareas del DAG
+### Sistema de Alertas
 
-1. **Extracción de Datos**
-   - **Descripción**: Extrae datos desde la fuente especificada.
-   - **Tarea**: `extract_data`
+El DAG cuenta con un sistema de alertas configurado para notificar el estado del proceso. Utiliza el archivo `email_notification.py` para gestionar el envío de correos electrónicos. Este sistema proporciona:
+- **Alertas en caso de fallo**: Si alguna tarea del DAG falla, se envía un correo electrónico con detalles del error, incluyendo el asunto del mensaje, el cuerpo del correo (que incluye información del error y un enlace al log), y la fecha de ejecución.
+- **Confirmaciones de éxito**: Al completar correctamente todas las tareas, se envía un correo de confirmación indicando que el DAG se ejecutó con éxito. Estos mensajes son editables y configurables a través del archivo `email_notification.py`.
 
-2. **Transformación de Datos**
-   - **Descripción**: Lee los datos extraídos y los transforma en el formato adecuado.
-   - **Tarea**: `transform_data`
+### Sensores y Limpieza de Archivos Temporales
 
-3. **Carga de Datos**
-   - **Descripción**: Carga los datos transformados en el destino final.
-   - **Tarea**: `load_data`
+Para garantizar que el proceso ETL funcione sin problemas, el DAG utiliza:
+- **Sensores**: Para verificar la existencia de archivos necesarios antes de continuar con las siguientes tareas. Por ejemplo:
+  - `extract_file_sensor`: Verifica la existencia del archivo CSV extraído antes de proceder con la transformación.
+  - `transform_file_sensor`: Verifica la existencia del archivo CSV transformado antes de cargar los datos.
+  
+- **Limpieza de Archivos Temporales**: Una tarea específica se encarga de eliminar todos los archivos temporales generados en el directorio `/tmp` al final del proceso. Esta tarea asegura que no queden residuos de datos temporales que puedan afectar futuras ejecuciones del DAG.
 
-4. **Verificación de Archivos de Extracción**
-   - **Descripción**: Verifica la existencia del archivo de datos extraídos antes de proceder con la transformación.
-   - **Tarea**: `extract_file_sensor`
+### Resumen de Tareas
 
-5. **Verificación de Archivos Transformados**
-   - **Descripción**: Verifica la existencia del archivo de datos transformados antes de proceder con la carga.
-   - **Tarea**: `transform_file_sensor`
+- **Extracción de Datos** (`extract_task`): Extrae los datos y los organiza en un DataFrame.
+- **Transformación de Datos** (`transform_task`): Transforma el DataFrame extraído y genera un ID único.
+- **Carga de Datos** (`load_task`): Carga el DataFrame transformado en Redshift.
+- **Sensores de Archivos** (`extract_file_sensor`, `transform_file_sensor`): Aseguran que los archivos necesarios están presentes antes de proceder.
+- **Limpieza de Archivos Temporales** (`cleanup_tmp_files`): Elimina archivos temporales generados durante el proceso.
 
-6. **Limpieza de Archivos Temporales**
-   - **Descripción**: Elimina todos los archivos temporales en el directorio `/tmp` después de la carga de datos.
-   - **Tarea**: `cleanup_tmp_files`
+Este enfoque garantiza una ejecución fluida del proceso ETL y una gestión efectiva de errores y archivos temporales.`
 
 ## Dependencias
 
@@ -85,7 +85,6 @@ Las tareas están organizadas de manera que:
 - La verificación del archivo transformado sigue a la transformación de datos.
 - La carga de datos ocurre después de la verificación del archivo transformado.
 - Finalmente, se realiza la limpieza de archivos temporales después de la carga de datos.
-
 
 ## Control de duplicados
 
