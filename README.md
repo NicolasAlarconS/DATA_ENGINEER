@@ -16,7 +16,7 @@ Este proyecto de ingeniería de datos está diseñado para extraer, transformar 
 
 1. **Extracción de Datos**: Los datos financieros se extraen desde la API de Twelve Data. Esta etapa obtiene los datos más recientes para una serie de símbolos de acciones y ETFs definidos en la configuración.
 
-2. **Transformación de Datos**: Los datos extraídos son transformados para ajustarse al formato requerido, incluyendo la generación de identificadores únicos y la adición de columnas adicionales como la fecha de ingestión.
+2. **Transformación de Datos**: Los datos extraídos son transformados para ajustarse al formato requerido, incluyendo la generación de identificadores únicos y la adición de columnas como la fecha de ingestión.
 
 3. **Carga de Datos**: Los datos transformados se cargan en una base de datos Redshift. Se maneja la creación de la tabla necesaria, la inserción en bloques y la eliminación de registros duplicados.
 
