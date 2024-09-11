@@ -65,5 +65,7 @@ def extract_data():
     print("Datos extraídos:\n")
     print(df.head())
     
+    print(f"Cantidad de registros extraidos : {df.shape[0]}")
+    
     # Guarda los datos extraídos en un archivo CSV en la carpeta temporal
     df.to_csv('/tmp/extracted_data.csv', index=False)
