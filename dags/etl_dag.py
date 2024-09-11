@@ -61,7 +61,7 @@ with DAG(
         filepath='/tmp/extracted_data.csv',
         poke_interval=30,  # Tiempo en segundos entre comprobaciones
         timeout=600,  # Tiempo máximo en segundos para esperar el archivo
-        mode='poke',  # Puedes usar 'reschedule' en lugar de 'poke' si prefieres ese modo
+        mode='poke',  
         dag=dag
     )
 
@@ -72,7 +72,7 @@ with DAG(
         filepath='/tmp/transformed_data.csv',
         poke_interval=30,  # Tiempo en segundos entre comprobaciones
         timeout=600,  # Tiempo máximo en segundos para esperar el archivo
-        mode='poke',  # Puedes usar 'reschedule' en lugar de 'poke' si prefieres ese modo
+        mode='poke',  
         dag=dag
     )
 

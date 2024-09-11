@@ -3,7 +3,7 @@ import os
 
 
 # Cargar el archivo de variables de entorno personalizado .env.dag
-load_dotenv(dotenv_path='dags/modules/.env.dag')
+load_dotenv(dotenv_path='.env')
 
 # Variables de entorno:
 REDSHIFT_USER = os.getenv('REDSHIFT_USER')
@@ -29,3 +29,13 @@ stocks = {
     'PFE': ('Pfizer Inc.', 'healthcare'),
     'VZ': ('Verizon Communications Inc.', 'communications'),
 }
+
+#Debug
+# print(REDSHIFT_USER)
+# print(REDSHIFT_PASSWORD)
+# print(REDSHIFT_HOST)
+# print(REDSHIFT_PORT)
+# print(REDSHIFT_DB)
+# print(REDSHIFT_SCHEMA)
+# print(TWELVE_DATA_API_KEY)
+# print(EMAIL)

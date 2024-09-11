@@ -1,0 +1,62 @@
+version: '3'
+
+env:
+  ROOT_PROJECT: ./Data_Engineer  # Cambia esta ruta si es necesario
+  DOCKER: docker-compose.yaml
+
+tasks:
+  create-env:
+    desc: "Crear el archivo .env con las variables de entorno necesarias"
+    cmds:
+      - echo "Creando el archivo .env en la raíz del proyecto..."
+      - |
+        cat <<EOF > $ROOT_PROJECT/.env
+        # Airflow
+        AIRFLOW_UID=1000
+        WEB_SERVER_HOST=http://localhost:8080
+        
+        # Variables SMTP para correos
+        AIRFLOW__SMTP__SMTP_HOST=smtp.gmail.com
+        AIRFLOW__SMTP__SMTP_STARTTLS=True
+        AIRFLOW__SMTP__SMTP_SSL=False
+        AIRFLOW__SMTP__SMTP_USER=airflowdataengineer@gmail.com
+        AIRFLOW__SMTP__SMTP_PASSWORD=bokn acqd ksln hlsh
+        AIRFLOW__SMTP__SMTP_PORT=587
+        
+        # REDSHIFT
+        REDSHIFT_USER=nicolas_alarcon_k_coderhouse
+        REDSHIFT_PASSWORD=nf32F7968i
+        REDSHIFT_HOST=data-engineer-cluster.cyhh5bfevlmn.us-east-1.redshift.amazonaws.com
+        REDSHIFT_PORT=5439
+        REDSHIFT_DB=data-engineer-database
+        REDSHIFT_SCHEMA=nicolas_alarcon_k_coderhouse
+        
+        # API
+        TWELVE_DATA_API_KEY=f1b1d80a8e4c4e9fb0bf76f14817f94f
+        URL=https://api.twelvedata.com/time_series
+        
+        # EMAIL donde se recibirán las notificaciones
+        EMAIL=nicolas.alarcon.x@gmail.com
+        EOF
+      - echo "Archivo .env creado exitosamente en $ROOT_PROJECT/.env"
+
+  start-project:
+    desc: "Inicializar y ejecutar el proyecto con Docker"
+    cmds:
+      - docker compose -f $ROOT_PROJECT/$DOCKER up airflow-init --build
+      - docker compose -f $ROOT_PROJECT/$DOCKER up -d --build
+      - docker container ls -a
+
+  down-project:
+    desc: "Detener y eliminar contenedores"
+    cmds:
+      - docker compose -f $ROOT_PROJECT/$DOCKER down
+
+  cleanup: 
+    desc: "Limpiar archivos y directorios generados"
+    cmds:
+      - rm -rf  $ROOT_PROJECT/{raw_data,processed_data,logs,plugins,config}
+      - rm -f   $ROOT_PROJECT/.env
+      - rm -rf  $ROOT_PROJECT/dags/*pycache*
+      - rm -rf  $ROOT_PROJECT/dags/*/*pycache*
+

@@ -40,7 +40,8 @@ def load_data(df):
                     
                 # Filtrar datos no duplicados basados en el ID
                 new_rows = block_df[~block_df['id'].isin(existing_ids)]
-                    
+
+                # Si la fila esta vacia continuar con la siguente    
                 if new_rows.empty:
                     print(f"No se agregaron registros nuevos.")
                     continue
@@ -54,7 +55,8 @@ def load_data(df):
                 VALUES %s
                 """
                 execute_values(cursor, insert_query, rows_to_insert)
-                    
+
+                # Commit de la insercion    
                 conn.commit()
                 print(f"Se ha agregado un bloque de {len(rows_to_insert)} registros a Redshift.")
 
